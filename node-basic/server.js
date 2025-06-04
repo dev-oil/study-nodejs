@@ -6,6 +6,9 @@ const bodyparser = require('body-parser');
 app.use(bodyparser.urlencoded({ extended: true }));
 app.use(bodyparser.json()); // JSON도 받을 수 있게 추가
 
+// 정적 파일 라이브러리
+app.use(express.static('public'));
+
 app.set('view engine', 'ejs');
 
 // mongoDB + Node.js 접속 코드
@@ -26,6 +29,7 @@ mongoclient
 
 // Mysql + Node.js 접속
 const mysql = require('mysql2');
+const { render } = require('ejs');
 const conn = mysql.createConnection({
   host: 'localhost',
   user: 'root',
@@ -102,5 +106,61 @@ app.post('/delete', (req, res) => {
     .then((result) => {
       console.log('삭제완료');
       res.status(200).send();
+    })
+    .catch((err) => {
+      console.log(err);
+      res.status(500).send();
     });
+});
+
+app.get('/content/:id', (req, res) => {
+  req.params.id = new ObjId(req.params.id);
+
+  mydb
+    .collection('post')
+    .findOne({ _id: req.params.id })
+    .then((result) => {
+      console.log(result);
+      res.render('content.ejs', { data: result });
+    });
+});
+
+// edit 값 끌어오기
+app.get('/edit/:id', (req, res) => {
+  console.log(req.params.id);
+  req.params.id = new ObjId(req.params.id);
+
+  mydb
+    .collection('post')
+    .findOne({ _id: req.params.id })
+    .then((result) => {
+      console.log(result);
+      res.render('edit.ejs', { data: result });
+    });
+});
+
+// 수정하기
+app.post('/edit', (req, res) => {
+  console.log(req.body);
+
+  req.body.id = new ObjId(req.body.id);
+
+  // updateOne(수정할 게시물 식별자, 수정할 값)
+  mydb
+    .collection('post')
+    .updateOne(
+      { _id: req.body.id },
+      {
+        $set: {
+          title: req.body.title,
+          content: req.body.content,
+          date: req.body.someDate,
+        },
+      }
+    )
+    .then((result) => {
+      console.log('수정 완료');
+      res.redirect('/list');
+    })
+    .catch((err) => console.log(error));
 });
