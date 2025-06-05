@@ -2,6 +2,8 @@ const express = require('express'); // express 라는 메소드 호출
 const app = express();
 const port = 3245;
 
+const sha = require('sha256');
+
 const bodyparser = require('body-parser');
 app.use(bodyparser.urlencoded({ extended: true }));
 app.use(bodyparser.json()); // JSON도 받을 수 있게 추가
@@ -78,7 +80,9 @@ conn.connect();
 //     </html>`)
 // );
 
-app.get('/', (req, res) => res.render('index.ejs'));
+app.get('/', (req, res) =>
+  res.render('index.ejs', { user: req.session.user ?? null })
+);
 
 app.get('/enter', (req, res) => res.render('enter.ejs'));
 
@@ -191,4 +195,66 @@ app.post('/edit', (req, res) => {
       res.redirect('/list');
     })
     .catch((err) => console.log(error));
+});
+
+// 로그인
+// 요청 라우터 생성
+app.get('/login', (req, res) => {
+  console.log(req.session);
+  if (req.session.user) {
+    console.log('세션 유지');
+    res.render('index.ejs', { user: req.session.user });
+  } else {
+    res.render('login.ejs');
+  }
+});
+
+// post
+app.post('/login', (req, res) => {
+  console.log('아이디 : ' + req.body.userid);
+  console.log('비밀번호 : ' + req.body.userpw);
+
+  mydb
+    .collection('account')
+    .findOne({ userid: req.body.userid })
+    .then((result) => {
+      if (result.userpw === sha(req.body.userpw)) {
+        req.session.user = req.body;
+        console.log('새로운 로그인');
+        res.redirect('/');
+      } else {
+        res.render('login.ejs');
+      }
+    });
+});
+
+app.get('/logout', (req, res) => {
+  console.log('로그아웃');
+  req.session.destroy();
+  res.redirect('/');
+});
+
+// 회원가입
+app.get('/signup', (req, res) => {
+  res.render('signup.ejs');
+});
+
+app.post('/signup', (req, res) => {
+  console.log(req.body.userid);
+  console.log(sha(req.body.userpw));
+  console.log(req.body.usergroup);
+  console.log(req.body.useremail);
+
+  mydb
+    .collection('account')
+    .insertOne({
+      userid: req.body.userid,
+      userpw: sha(req.body.userpw),
+      usergroup: req.body.usergroup,
+      useremail: req.body.useremail,
+    })
+    .then((result) => {
+      console.log('회원가입 성공');
+    });
+  res.redirect('/');
 });
