@@ -11,12 +11,31 @@ app.use(express.static('public'));
 
 app.set('view engine', 'ejs');
 
+// 쿠키
 let cookieParser = require('cookie-parser');
 
 app.use(cookieParser());
 app.get('/cookie', (req, res) => {
   res.cookie('milk', '1000원');
   res.send('product :' + req.cookies.milk);
+});
+
+// 세션
+let session = require('express-session');
+app.use(
+  session({
+    secret: 'sdklfjsd',
+    resave: false,
+    saveUninitialized: true,
+  })
+);
+
+app.get('/session', (req, res) => {
+  if (isNaN(req.session.milk)) {
+    req.session.milk = 0;
+  }
+  req.session.milk = req.session.milk + 1000;
+  res.send('session : ' + req.session.milk + '원');
 });
 
 // mongoDB + Node.js 접속 코드
