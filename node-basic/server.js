@@ -11,6 +11,14 @@ app.use(express.static('public'));
 
 app.set('view engine', 'ejs');
 
+let cookieParser = require('cookie-parser');
+
+app.use(cookieParser());
+app.get('/cookie', (req, res) => {
+  res.cookie('milk', '1000원');
+  res.send('product :' + req.cookies.milk);
+});
+
 // mongoDB + Node.js 접속 코드
 const mongoclient = require('mongodb').MongoClient;
 const ObjId = require('mongodb').ObjectId;
@@ -51,7 +59,7 @@ conn.connect();
 //     </html>`)
 // );
 
-app.get('/', (req, res) => res.sendFile(__dirname + '/index.html'));
+app.get('/', (req, res) => res.render('index.ejs'));
 
 app.get('/enter', (req, res) => res.render('enter.ejs'));
 
@@ -71,6 +79,7 @@ app.post('/save', (req, res) => {
       console.log(result);
       console.log('데이터 추가 성공');
     });
+  res.redirect('/list');
 
   // SQL
   // let sql = 'insert into post (title, content, created) values(?, ?, now())';
