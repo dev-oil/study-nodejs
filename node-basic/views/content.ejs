@@ -17,9 +17,11 @@
       <div class="card mt-5" style="width: 50%; margin: 0 auto">
         <div class="card-body">
           <h3 class="card-title"><%= data.title %></h3>
+          <img src="<%= data.path %>" alt="" width="200" />
           <p class="card-subtitle mb-2 text-body-secondary"><%= data.date %></p>
           <p class="card-text"><%= data.content %></p>
           <a href="/edit/<%= data._id %>" class="card-link">수정하기</a>
+          <a href="/list %>" class="card-link">목록</a>
         </div>
       </div>
     </main>

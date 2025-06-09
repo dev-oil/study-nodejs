@@ -9,7 +9,8 @@ app.use(bodyparser.urlencoded({ extended: true }));
 app.use(bodyparser.json()); // JSON도 받을 수 있게 추가
 
 // 정적 파일 라이브러리
-app.use(express.static('public'));
+// app.use(express.static('public'));
+app.use('/public', express.static('public'));
 
 app.set('view engine', 'ejs');
 
@@ -97,6 +98,7 @@ app.post('/save', (req, res) => {
       title: req.body.title,
       content: req.body.content,
       date: req.body.someDate,
+      path: imagepath,
     })
     .then((result) => {
       console.log(result);
@@ -257,4 +259,25 @@ app.post('/signup', (req, res) => {
       console.log('회원가입 성공');
     });
   res.redirect('/');
+});
+
+// 이미지 업로드 기능
+let multer = require('multer');
+
+let storage = multer.diskStorage({
+  destination: (req, file, done) => {
+    done(null, './public/image');
+  },
+  filename: (req, file, done) => {
+    done(null, file.originalname);
+  },
+});
+
+let upload = multer({ storage: storage });
+
+let imagepath = '';
+
+app.post('/photo', upload.single('picture'), (req, res) => {
+  console.log(req.file.path);
+  imagepath = '/' + req.file.path;
 });
