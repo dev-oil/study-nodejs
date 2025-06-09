@@ -1,6 +1,6 @@
 const express = require('express'); // express 라는 메소드 호출
 const app = express();
-const port = 3245;
+const port = process.env.PORT;
 
 const sha = require('sha256');
 
@@ -41,12 +41,13 @@ app.get('/session', (req, res) => {
   res.send('session : ' + req.session.milk + '원');
 });
 
+const dotenv = require('dotenv').config();
+
 // mongoDB + Node.js 접속 코드
 const mongoclient = require('mongodb').MongoClient;
 const ObjId = require('mongodb').ObjectId;
 
-const url =
-  'mongodb+srv://yoo:[비번]@cluster0.a3vdfze.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0';
+const url = process.env.DB_URL;
 mongoclient
   .connect(url)
   .then((client) => {
