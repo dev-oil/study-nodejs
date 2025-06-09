@@ -21,6 +21,7 @@
     "objectid": "^3.2.1",
     "passport": "^0.7.0",
     "passport-facebook": "^3.0.0",
+    "passport-kakao": "^1.0.1",
     "passport-local": "^1.0.0",
     "sha256": "^0.2.0"
   }
