@@ -38,7 +38,9 @@
         <tbody>
           <% data.forEach((item) => { %>
           <tr>
-            <td><a href="/content/<%= item._id %>"><%= item.title %></a></td>
+            <td>
+              <a href="/post/content/<%= item._id %>"><%= item.title %></a>
+            </td>
             <td><%= item.date %></td>
             <td>
               <button
